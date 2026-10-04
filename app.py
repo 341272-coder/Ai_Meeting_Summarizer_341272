@@ -1,100 +1,161 @@
 import streamlit as st
 from groq import Groq
-import textwrap
 
-# ---------------------------------------------------------
-# PAGE CONFIGURATION
-# ---------------------------------------------------------
+# ---------------------------------------------------
+# PAGE CONFIG
+# ---------------------------------------------------
+
 st.set_page_config(
     page_title="MeetingMate AI",
-    page_icon="🤝",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ---------------------------------------------------------
+# ---------------------------------------------------
 # CUSTOM CSS
-# ---------------------------------------------------------
+# ---------------------------------------------------
+
 st.markdown(
     """
     <style>
 
     .stApp {
-        background-color: #f5f7fb;
+        background: #f4f7f9;
     }
 
-    /* Hero */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+        max-width: 1250px;
+    }
+
+    section[data-testid="stSidebar"] {
+        background: #102a2e;
+    }
+
+    section[data-testid="stSidebar"] * {
+        color: #f4f7f9;
+    }
+
     .hero {
-        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
         padding: 38px 42px;
-        border-radius: 20px;
+        border-radius: 22px;
+        background:
+            radial-gradient(
+                circle at top right,
+                rgba(63, 209, 177, 0.35),
+                transparent 35%
+            ),
+            linear-gradient(135deg, #102a2e, #17484d);
         color: white;
         margin-bottom: 28px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.10);
     }
 
     .hero-badge {
         display: inline-block;
-        background: rgba(255,255,255,0.14);
         padding: 7px 14px;
-        border-radius: 20px;
+        border-radius: 30px;
+        background: rgba(255,255,255,0.12);
         font-size: 13px;
-        margin-bottom: 13px;
+        font-weight: 600;
+        margin-bottom: 15px;
     }
 
     .hero h1 {
-        font-size: 40px;
-        margin: 0;
-        font-weight: 700;
+        font-size: 42px;
+        margin: 0 0 8px 0;
+        font-weight: 750;
     }
 
     .hero p {
         font-size: 17px;
-        margin-top: 11px;
-        opacity: 0.9;
+        opacity: 0.90;
+        margin: 0;
+        max-width: 720px;
+        line-height: 1.6;
     }
 
-    /* Cards */
-    .card {
+    .stat-card {
         background: white;
-        padding: 26px;
+        padding: 20px;
         border-radius: 16px;
-        box-shadow: 0 4px 18px rgba(0,0,0,0.05);
-        margin-bottom: 22px;
+        border: 1px solid #e4e9ec;
+        min-height: 115px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.04);
     }
 
-    /* Section headings */
-    .section-title {
-        font-size: 22px;
-        font-weight: 700;
-        color: #203a43;
+    .stat-icon {
+        font-size: 25px;
         margin-bottom: 8px;
     }
 
-    /* Sidebar */
-    section[data-testid="stSidebar"] {
-        background-color: #ffffff;
+    .stat-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #16383c;
     }
 
-    /* Buttons */
+    .stat-text {
+        font-size: 13px;
+        color: #68777b;
+        margin-top: 5px;
+    }
+
+    .section-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #15836f;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 3px;
+    }
+
+    .section-title {
+        font-size: 27px;
+        font-weight: 750;
+        color: #16383c;
+        margin-bottom: 7px;
+    }
+
+    .section-subtitle {
+        color: #718084;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .result-box {
+        background: white;
+        padding: 28px;
+        border-radius: 18px;
+        border-left: 5px solid #1b9c85;
+        box-shadow: 0 6px 22px rgba(0,0,0,0.05);
+        margin-top: 15px;
+    }
+
+    .stTextArea textarea {
+        border-radius: 14px !important;
+        border: 1px solid #d9e2e4 !important;
+        background: white !important;
+    }
+
     .stButton > button {
         border-radius: 10px;
-        font-weight: 600;
-        padding: 10px 18px;
+        font-weight: 650;
+        min-height: 43px;
     }
 
-    /* Text area */
-    textarea {
-        border-radius: 12px !important;
+    div[data-testid="stButton"] button[kind="primary"] {
+        background: #168b77;
+        border: none;
     }
 
-    /* Footer */
     .footer {
         text-align: center;
-        color: #777;
+        color: #879396;
         font-size: 13px;
-        margin-top: 45px;
-        padding: 20px;
+        padding-top: 40px;
     }
 
     </style>
@@ -102,378 +163,548 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ---------------------------------------------------------
-# HERO SECTION
-# ---------------------------------------------------------
-st.markdown(
-    textwrap.dedent(
-        """
-        <div class="hero">
-            <div class="hero-badge">🤝 AI-Powered Meeting Assistant</div>
-            <h1>MeetingMate AI</h1>
-            <p>
-                Turn meeting conversations into clear decisions,
-                responsibilities and next steps.
-            </p>
-        </div>
-        """
-    ),
-    unsafe_allow_html=True
-)
+# ---------------------------------------------------
+# GROQ CONNECTION
+# ---------------------------------------------------
 
-# ---------------------------------------------------------
-# SIDEBAR
-# ---------------------------------------------------------
-with st.sidebar:
-
-    st.markdown("## 🤝 MeetingMate AI")
-
-    st.markdown(
-        """
-        MeetingMate AI transforms meeting conversations into:
-
-        - 📝 Key Takeaways
-        - ✅ Action Items
-        - 👤 Responsible People
-        - 📅 Deadlines
-        - 🎯 Decisions
-        - ⚠️ Risks & Dependencies
-        """
-    )
-
-    st.divider()
-
-    st.markdown("### 🔄 How It Works")
-
-    st.markdown(
-        """
-        **1. Add Meeting Notes**
-
-        Paste your meeting conversation.
-
-        **2. Analyse**
-
-        Let AI identify the important information.
-
-        **3. Review**
-
-        Check the generated tasks, decisions and next steps.
-        """
-    )
-
-    st.divider()
-
-    st.markdown("### 🧠 Technology")
-
-    st.markdown(
-        """
-        **Built with:** Python + Streamlit
-
-        **AI Provider:** Groq
-
-        **AI Model:** GPT-OSS 120B
-        """
-    )
-
-    st.divider()
-
-    st.caption("Academic Project • FORE School of Management")
-
-
-# ---------------------------------------------------------
-# GROQ API CONNECTION
-# ---------------------------------------------------------
 try:
-
     api_key = st.secrets["GROQ_API_KEY"]
-
-    client = Groq(
-        api_key=api_key
-    )
+    client = Groq(api_key=api_key)
 
 except Exception:
-
     st.error(
-        "⚠️ Groq API key is not configured. "
-        "Please add GROQ_API_KEY in Streamlit Secrets."
+        "Groq API connection is not configured. "
+        "Please add GROQ_API_KEY to Streamlit Secrets."
     )
-
     st.stop()
 
 
-# ---------------------------------------------------------
-# SAMPLE MEETING TRANSCRIPT
-# ---------------------------------------------------------
-sample_transcript = """
-Meeting Title: Quarterly Marketing Performance Review
-Date: 3 October 2026
+# ---------------------------------------------------
+# SESSION STATE
+# ---------------------------------------------------
 
-Attendees:
+if "meeting_text" not in st.session_state:
+    st.session_state.meeting_text = ""
+
+if "analysis_result" not in st.session_state:
+    st.session_state.analysis_result = ""
+
+
+# ---------------------------------------------------
+# NEW SAMPLE MEETING
+# ---------------------------------------------------
+
+SAMPLE_MEETING = """Customer Experience Improvement Meeting
+Date: 4 October 2026
+
+Participants:
 Piyansh Bhutani – Project Coordinator
-Riya Sharma – Marketing Lead
-Karan Mehta – Sales Manager
-Aditya Kapoor – Finance Lead
+Aarav Mehta – Customer Experience Lead
+Simran Kapoor – Operations Manager
+Devansh Rao – Product Manager
 
-Piyansh:
-Let's review the performance of our recent digital marketing campaign and identify what needs to change for the October campaign.
+Piyansh: Thanks everyone. The purpose of today's meeting is to understand
+why customer complaints have increased during the last month and decide
+what we should improve first.
 
-Riya:
-The campaign generated strong website traffic, but our conversion rate was lower than expected. I think the landing page needs improvement.
+Aarav: The biggest issue appears to be delayed responses from customer
+support. Customers are waiting too long for their queries to be resolved.
 
-Karan:
-From the sales side, we noticed that leads from Instagram were higher in volume, but leads from LinkedIn were more likely to convert.
+Simran: Operations can review the current support workflow. I believe some
+requests are being transferred between teams unnecessarily.
 
-Aditya:
-We have some flexibility in the marketing budget, but I would like the next campaign to have a clearer return-on-investment target.
+Devansh: We should also look at the product side. A number of complaints
+are related to customers finding the return process confusing.
 
-Riya:
-I can redesign the landing page and prepare two alternative versions for testing by 8 October.
+Piyansh: Can we separate the complaints into support-related and
+product-related categories before deciding on a solution?
 
-Karan:
-I will share the channel-wise lead conversion data with the marketing team by 6 October.
+Aarav: Yes. I'll prepare a complaint-category analysis by 7 October.
 
-Aditya:
-Once we have that data, I can recommend how the additional budget should be allocated.
+Simran: I'll map the existing customer-support workflow and identify
+where delays are occurring by 9 October.
 
-Piyansh:
-Let's also test a LinkedIn-focused campaign instead of increasing spending equally across all channels.
+Devansh: I'll review the current return process and suggest improvements
+after seeing the complaint analysis.
 
-Riya:
-That works. I'll prepare the campaign concept and revised landing-page copy by 10 October.
+Piyansh: Good. We should also consider whether a clearer FAQ section
+could reduce repetitive customer queries.
 
-Karan:
-The sales team can provide feedback on the quality of leads during the first week of the campaign.
+Aarav: I can prepare a list of the ten most frequently asked questions
+for the FAQ review by 8 October.
 
-Piyansh:
-Good. Let's review the revised campaign plan and budget allocation on 12 October.
+Simran: Once the workflow analysis is complete, I'll discuss the findings
+with the support team.
+
+Piyansh: Let's meet again on 11 October to review the findings and decide
+which improvements should be implemented first.
 """
 
 
-# ---------------------------------------------------------
-# INPUT SECTION
-# ---------------------------------------------------------
+# ---------------------------------------------------
+# SIDEBAR
+# ---------------------------------------------------
+
+with st.sidebar:
+
+    st.markdown("## ⚡ MeetingMate")
+
+    st.caption("AI Meeting Intelligence Workspace")
+
+    st.markdown("---")
+
+    st.markdown("### Workspace")
+
+    st.markdown(
+        """
+        **📝 Conversation Analysis**
+
+        Transform raw meeting conversations into
+        structured managerial insights.
+        """
+    )
+
+    st.markdown("---")
+
+    st.markdown("### AI Detects")
+
+    st.markdown(
+        """
+        🎯 Priorities
+
+        ✅ Assigned Tasks
+
+        👤 Responsible People
+
+        📅 Deadlines
+
+        💡 Decisions
+
+        ⚠️ Open Issues
+        """
+    )
+
+    st.markdown("---")
+
+    st.markdown("### AI Engine")
+
+    st.caption("Groq Cloud API")
+    st.caption("GPT-OSS 120B")
+    st.caption("Python + Streamlit")
+
+    st.markdown("---")
+
+    st.caption("Academic Prototype")
+    st.caption("FORE School of Management")
+
+
+# ---------------------------------------------------
+# HERO
+# ---------------------------------------------------
+
 st.markdown(
-    '<div class="section-title">💬 Meeting Conversation</div>',
+    """
+    <div class="hero">
+        <div class="hero-badge">
+            ⚡ MEETING INTELLIGENCE WORKSPACE
+        </div>
+
+        <h1>MeetingMate AI</h1>
+
+        <p>
+        Convert meeting conversations into structured priorities,
+        responsibilities, decisions and follow-up actions — in seconds.
+        </p>
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
-st.write(
-    "Add your meeting conversation below, or load the sample marketing review "
-    "to test the application."
+
+# ---------------------------------------------------
+# FEATURE CARDS
+# ---------------------------------------------------
+
+c1, c2, c3, c4 = st.columns(4)
+
+with c1:
+    st.markdown(
+        """
+        <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-title">Key Takeaways</div>
+            <div class="stat-text">
+                Identify the most important points discussed.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+with c2:
+    st.markdown(
+        """
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-title">Task Tracker</div>
+            <div class="stat-text">
+                Capture commitments and responsibilities.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+with c3:
+    st.markdown(
+        """
+        <div class="stat-card">
+            <div class="stat-icon">💡</div>
+            <div class="stat-title">Decision Capture</div>
+            <div class="stat-text">
+                Separate decisions from general discussion.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+with c4:
+    st.markdown(
+        """
+        <div class="stat-card">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-title">Open Issues</div>
+            <div class="stat-text">
+                Highlight dependencies and unresolved matters.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+st.write("")
+st.write("")
+
+
+# ---------------------------------------------------
+# MEETING INPUT
+# ---------------------------------------------------
+
+st.markdown(
+    """
+    <div class="section-label">01 / INPUT</div>
+
+    <div class="section-title">
+        Meeting Workspace
+    </div>
+
+    <div class="section-subtitle">
+        Paste a meeting transcript, discussion, call notes or conversation below.
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
-col1, col2 = st.columns([1, 1])
 
-with col1:
+button_col1, button_col2, empty_col = st.columns(
+    [1.6, 1, 4]
+)
+
+
+with button_col1:
 
     if st.button(
-        "📊 Load Sample Marketing Review",
+        "📊 Load Demo Meeting",
         use_container_width=True
     ):
 
-        st.session_state["transcript"] = sample_transcript
+        st.session_state.meeting_text = SAMPLE_MEETING
+        st.session_state.analysis_result = ""
+
+        st.rerun()
 
 
-with col2:
+with button_col2:
 
     if st.button(
-        "🗑️ Clear Conversation",
+        "↻ Reset",
         use_container_width=True
     ):
 
-        st.session_state["transcript"] = ""
+        st.session_state.meeting_text = ""
+        st.session_state.analysis_result = ""
+
+        st.rerun()
 
 
-# ---------------------------------------------------------
-# SESSION STATE
-# ---------------------------------------------------------
-if "transcript" not in st.session_state:
-
-    st.session_state["transcript"] = ""
-
-
-transcript = st.text_area(
-    "Meeting Conversation",
-    value=st.session_state["transcript"],
-    height=360,
-    placeholder="Paste your meeting conversation here...",
+meeting_text = st.text_area(
+    "Meeting conversation",
+    value=st.session_state.meeting_text,
+    height=330,
+    placeholder=(
+        "Paste your meeting conversation here...\n\n"
+        "Example:\n"
+        "Rohan: I'll prepare the report by Friday.\n"
+        "Meera: Great. We'll review it next Monday."
+    ),
     label_visibility="collapsed"
 )
 
+st.session_state.meeting_text = meeting_text
 
-# ---------------------------------------------------------
-# ANALYSE BUTTON
-# ---------------------------------------------------------
+
+# ---------------------------------------------------
+# ANALYSIS MODE
+# ---------------------------------------------------
+
 st.write("")
 
-generate = st.button(
-    "🚀 Analyse Meeting",
+st.markdown(
+    """
+    <div class="section-label">
+        02 / ANALYSIS SETTINGS
+    </div>
+
+    <div class="section-title">
+        Choose Analysis Depth
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+
+analysis_mode = st.radio(
+    "Analysis mode",
+    [
+        "Quick Scan",
+        "Standard Analysis",
+        "Detailed Review"
+    ],
+    horizontal=True,
+    index=1
+)
+
+
+if analysis_mode == "Quick Scan":
+
+    mode_instruction = """
+    Keep the analysis concise. Focus on the most important
+    takeaways, confirmed tasks and decisions.
+    """
+
+elif analysis_mode == "Detailed Review":
+
+    mode_instruction = """
+    Provide a detailed review including context,
+    dependencies, unresolved issues and follow-up items.
+    """
+
+else:
+
+    mode_instruction = """
+    Provide a balanced professional analysis with useful
+    context while avoiding unnecessary detail.
+    """
+
+
+# ---------------------------------------------------
+# ANALYSE BUTTON
+# ---------------------------------------------------
+
+st.write("")
+
+analyse = st.button(
+    "⚡ Generate Meeting Intelligence",
     type="primary",
     use_container_width=True
 )
 
 
-# ---------------------------------------------------------
-# AI PROCESSING
-# ---------------------------------------------------------
-if generate:
+# ---------------------------------------------------
+# AI ANALYSIS
+# ---------------------------------------------------
 
-    if not transcript.strip():
+if analyse:
+
+    if not meeting_text.strip():
 
         st.warning(
-            "⚠️ Please enter a meeting conversation before analysing it."
+            "Please add a meeting conversation before running the analysis."
         )
 
     else:
 
-        with st.spinner(
-            "🤖 Analysing the meeting and identifying important outcomes..."
-        ):
+        prompt = f"""
+You are MeetingMate AI, a professional meeting intelligence assistant.
 
-            prompt = f"""
-You are MeetingMate AI, an intelligent meeting-analysis assistant.
+Analyse the meeting conversation below and convert it into useful
+managerial information.
 
-Your job is to convert the meeting conversation below into a concise,
-business-friendly set of insights that a manager can immediately act upon.
+RULES:
 
-Analyse the conversation carefully and distinguish between:
+1. Use ONLY information provided in the conversation.
+2. Never invent people, dates, tasks or decisions.
+3. Distinguish confirmed commitments from suggestions.
+4. Questions should not automatically be treated as decisions.
+5. If a task has no owner, write "Not specified".
+6. If a task has no deadline, write "Not specified".
+7. Clearly separate confirmed decisions from unresolved issues.
+8. Preserve names and dates accurately.
+9. Do not make assumptions.
 
-- confirmed commitments
-- suggestions
-- questions
-- decisions
-- unresolved issues
+ANALYSIS DEPTH:
 
-IMPORTANT RULES:
+{mode_instruction}
 
-- Never invent an owner.
-- Never invent a deadline.
-- If ownership is unclear, write "Not specified".
-- If no deadline is mentioned, write "Not specified".
-- Do not treat questions or suggestions as confirmed commitments.
-- Base your answer only on information contained in the conversation.
-- Keep the output concise and professional.
+Return the result using exactly this structure:
 
-Return the answer using EXACTLY this structure:
+## 🎯 Meeting Brief
 
-## 1. Meeting Snapshot
+Give a concise overview of the meeting and its main purpose.
 
-Give 3–5 concise bullet points describing the most important outcomes.
+## ⭐ Priority Takeaways
 
-## 2. Action Tracker
+Give the most important points as bullet points.
+
+## ✅ Commitment Tracker
 
 Create a Markdown table:
 
-| Task / Follow-Up | Responsible Person | Deadline |
-|---|---|---|
+| Commitment / Task | Owner | Deadline | Status |
 
-Only include genuine action items or confirmed commitments.
+Use "Confirmed" only when the speaker clearly commits
+to completing the task.
 
-## 3. Decisions Made
+## 💡 Decisions Confirmed
 
-List the decisions that were actually agreed upon.
+List only decisions that were clearly agreed upon.
 
-## 4. Open Issues & Dependencies
+## ⚠️ Open Issues & Dependencies
 
-Identify unresolved questions, dependencies, risks or information that is still required.
+List unresolved matters, dependencies and topics
+that require additional discussion.
 
-## 5. Next Steps
+## 🔜 Follow-Up Plan
 
-Give a concise list of what should happen next.
+Explain the next follow-up steps based only on
+what was explicitly mentioned.
 
 MEETING CONVERSATION:
 
-{transcript}
+{meeting_text}
 """
+
+        with st.spinner(
+            "MeetingMate is analysing the conversation..."
+        ):
 
             try:
 
                 response = client.chat.completions.create(
-
                     model="openai/gpt-oss-120b",
 
                     messages=[
-
                         {
                             "role": "system",
                             "content": (
-                                "You are MeetingMate AI, a professional "
-                                "meeting-analysis assistant. Accuracy and "
-                                "faithful extraction are more important "
-                                "than creativity."
+                                "You are a professional meeting analysis "
+                                "assistant. Accuracy and faithful extraction "
+                                "are more important than creativity."
                             )
                         },
-
                         {
                             "role": "user",
                             "content": prompt
                         }
-
                     ],
 
                     temperature=0.2,
-
                     max_tokens=1800
                 )
 
-                result = response.choices[0].message.content
-
-
-                # -------------------------------------------------
-                # RESULTS
-                # -------------------------------------------------
-                st.markdown(
-                    '<div class="section-title">🚀 Meeting Analysis</div>',
-                    unsafe_allow_html=True
+                st.session_state.analysis_result = (
+                    response.choices[0].message.content
                 )
-
-                st.markdown(
-                    '<div class="card">',
-                    unsafe_allow_html=True
-                )
-
-                st.markdown(result)
-
-                st.markdown(
-                    '</div>',
-                    unsafe_allow_html=True
-                )
-
-
-                # -------------------------------------------------
-                # HUMAN REVIEW MESSAGE
-                # -------------------------------------------------
-                st.info(
-                    "👤 **Human Review Recommended:** "
-                    "AI-generated meeting insights should be reviewed "
-                    "against the original conversation before being used "
-                    "for important business decisions."
-                )
-
 
             except Exception as e:
 
                 st.error(
-                    "❌ Unable to analyse the meeting right now."
+                    "The AI service could not process the meeting. "
+                    "Please try again."
                 )
 
                 st.caption(
-                    f"Technical details: {str(e)}"
+                    f"Technical details: {e}"
                 )
 
 
-# ---------------------------------------------------------
-# FOOTER
-# ---------------------------------------------------------
-st.markdown(
-    textwrap.dedent(
+# ---------------------------------------------------
+# OUTPUT
+# ---------------------------------------------------
+
+if st.session_state.analysis_result:
+
+    st.write("")
+    st.write("")
+
+    st.markdown(
         """
-        <div class="footer">
-            <b>MeetingMate AI</b><br>
-            Turning meeting conversations into clear next steps<br><br>
-            Academic Project • FORE School of Management
+        <div class="section-label">
+            03 / INTELLIGENCE REPORT
         </div>
-        """
-    ),
+
+        <div class="section-title">
+            Meeting Analysis
+        </div>
+
+        <div class="section-subtitle">
+            Structured insights generated from the submitted conversation.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        '<div class="result-box">',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        st.session_state.analysis_result
+    )
+
+    st.markdown(
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    st.write("")
+
+    st.info(
+        "👤 Human Review Recommended — "
+        "AI-generated insights should be checked against "
+        "the original meeting conversation before important "
+        "decisions are made."
+    )
+
+
+# ---------------------------------------------------
+# FOOTER
+# ---------------------------------------------------
+
+st.markdown(
+    """
+    <div class="footer">
+
+        <b>MeetingMate AI</b><br>
+
+        From conversation to clarity.<br><br>
+
+        Academic Project • FORE School of Management
+
+    </div>
+    """,
     unsafe_allow_html=True
 )
