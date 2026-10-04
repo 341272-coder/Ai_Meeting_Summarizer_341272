@@ -1,13 +1,14 @@
 import streamlit as st
 from groq import Groq
 
+
 # =========================================================
-# PAGE CONFIGURATION
+# PAGE CONFIG
 # =========================================================
 
 st.set_page_config(
     page_title="MeetingMate AI",
-    page_icon="⚡",
+    page_icon="🤝",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -19,195 +20,83 @@ st.set_page_config(
 
 st.markdown(
     """
-<style>
+    <style>
+        .stApp {
+            background-color: #f4f7f9;
+        }
 
-.stApp {
-    background: #f4f7f9;
-}
+        .block-container {
+            max-width: 1250px;
+            padding-top: 2rem;
+            padding-bottom: 3rem;
+        }
 
-.block-container {
-    padding-top: 2rem;
-    padding-bottom: 3rem;
-    max-width: 1250px;
-}
+        section[data-testid="stSidebar"] {
+            background-color: #102a2e;
+        }
 
+        section[data-testid="stSidebar"] * {
+            color: white;
+        }
 
-/* ---------------- SIDEBAR ---------------- */
+        div[data-testid="stMetric"] {
+            background-color: white;
+            padding: 18px;
+            border-radius: 14px;
+            border: 1px solid #e1e7e9;
+        }
 
-section[data-testid="stSidebar"] {
-    background: #102a2e;
-}
+        div[data-testid="stVerticalBlockBorderWrapper"] {
+            background-color: white;
+            border-radius: 16px;
+        }
 
-section[data-testid="stSidebar"] * {
-    color: #f4f7f9;
-}
+        .stTextArea textarea {
+            border-radius: 12px;
+        }
 
+        .stButton button {
+            border-radius: 10px;
+            font-weight: 600;
+        }
 
-/* ---------------- HERO ---------------- */
+        h1 {
+            color: #16383c;
+        }
 
-.hero {
-    padding: 38px 42px;
-    border-radius: 22px;
-    background:
-        radial-gradient(
-            circle at top right,
-            rgba(63, 209, 177, 0.35),
-            transparent 35%
-        ),
-        linear-gradient(135deg, #102a2e, #17484d);
-    color: white;
-    margin-bottom: 28px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.10);
-}
+        h2 {
+            color: #16383c;
+        }
 
-.hero-badge {
-    display: inline-block;
-    padding: 7px 14px;
-    border-radius: 30px;
-    background: rgba(255,255,255,0.12);
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 15px;
-}
+        h3 {
+            color: #16383c;
+        }
 
-.hero h1 {
-    font-size: 42px;
-    margin: 0 0 8px 0;
-    font-weight: 750;
-}
-
-.hero p {
-    font-size: 17px;
-    opacity: 0.90;
-    margin: 0;
-    max-width: 720px;
-    line-height: 1.6;
-}
-
-
-/* ---------------- FEATURE CARDS ---------------- */
-
-.stat-card {
-    background: white;
-    padding: 20px;
-    border-radius: 16px;
-    border: 1px solid #e4e9ec;
-    min-height: 115px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-}
-
-.stat-icon {
-    font-size: 25px;
-    margin-bottom: 8px;
-}
-
-.stat-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #16383c;
-}
-
-.stat-text {
-    font-size: 13px;
-    color: #68777b;
-    margin-top: 5px;
-}
-
-
-/* ---------------- SECTION HEADINGS ---------------- */
-
-.section-label {
-    font-size: 13px;
-    font-weight: 700;
-    color: #15836f;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 3px;
-}
-
-.section-title {
-    font-size: 27px;
-    font-weight: 750;
-    color: #16383c;
-    margin-bottom: 7px;
-}
-
-.section-subtitle {
-    color: #718084;
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-
-
-/* ---------------- RESULT ---------------- */
-
-.result-box {
-    background: white;
-    padding: 28px;
-    border-radius: 18px;
-    border-left: 5px solid #1b9c85;
-    box-shadow: 0 6px 22px rgba(0,0,0,0.05);
-    margin-top: 15px;
-}
-
-
-/* ---------------- TEXT AREA ---------------- */
-
-.stTextArea textarea {
-    border-radius: 14px !important;
-    border: 1px solid #d9e2e4 !important;
-    background: white !important;
-}
-
-
-/* ---------------- BUTTONS ---------------- */
-
-.stButton > button {
-    border-radius: 10px;
-    font-weight: 650;
-    min-height: 43px;
-}
-
-div[data-testid="stButton"] button[kind="primary"] {
-    background: #168b77;
-    border: none;
-}
-
-
-/* ---------------- FOOTER ---------------- */
-
-.footer {
-    text-align: center;
-    color: #879396;
-    font-size: 13px;
-    padding-top: 40px;
-}
-
-</style>
-""",
+        .footer-text {
+            text-align: center;
+            color: #7c898c;
+            margin-top: 40px;
+            padding: 20px;
+        }
+    </style>
+    """,
     unsafe_allow_html=True
 )
 
 
 # =========================================================
-# GROQ API CONNECTION
+# GROQ CONNECTION
 # =========================================================
 
 try:
-
     api_key = st.secrets["GROQ_API_KEY"]
-
-    client = Groq(
-        api_key=api_key
-    )
+    client = Groq(api_key=api_key)
 
 except Exception:
-
     st.error(
-        "Groq API connection is not configured. "
-        "Please add GROQ_API_KEY to Streamlit Secrets."
+        "Groq API key is not configured. "
+        "Please add GROQ_API_KEY under Streamlit Secrets."
     )
-
     st.stop()
 
 
@@ -279,259 +168,156 @@ which improvements should be implemented first.
 
 with st.sidebar:
 
-    st.markdown("## ⚡ MeetingMate")
+    st.title("🤝 MeetingMate")
 
+    st.caption("AI Meeting Intelligence Workspace")
+
+    st.divider()
+
+    st.subheader("Workspace")
+
+    st.write("📝 Conversation Analysis")
     st.caption(
-        "AI Meeting Intelligence Workspace"
+        "Transform raw meeting conversations into "
+        "structured managerial insights."
     )
 
-    st.markdown("---")
+    st.divider()
 
-    st.markdown("### Workspace")
+    st.subheader("AI Detects")
 
-    st.markdown(
-        """
-**📝 Conversation Analysis**
+    st.write("🎯 Priorities")
+    st.write("✅ Assigned Tasks")
+    st.write("👤 Responsible People")
+    st.write("📅 Deadlines")
+    st.write("💡 Decisions")
+    st.write("⚠️ Open Issues")
 
-Transform raw meeting conversations
-into structured managerial insights.
-"""
-    )
+    st.divider()
 
-    st.markdown("---")
-
-    st.markdown("### AI Detects")
-
-    st.markdown(
-        """
-🎯 Priorities
-
-✅ Assigned Tasks
-
-👤 Responsible People
-
-📅 Deadlines
-
-💡 Decisions
-
-⚠️ Open Issues
-"""
-    )
-
-    st.markdown("---")
-
-    st.markdown("### AI Engine")
+    st.subheader("AI Engine")
 
     st.caption("Groq Cloud API")
     st.caption("GPT-OSS 120B")
     st.caption("Python + Streamlit")
 
-    st.markdown("---")
+    st.divider()
 
     st.caption("Academic Prototype")
     st.caption("FORE School of Management")
 
 
 # =========================================================
-# HERO SECTION
+# MAIN HEADER
 # =========================================================
 
-st.markdown(
-    """
-<div class="hero">
+st.subheader("⚡ MEETING INTELLIGENCE WORKSPACE")
 
-    <div class="hero-badge">
-        ⚡ MEETING INTELLIGENCE WORKSPACE
-    </div>
+st.title("MeetingMate AI")
 
-    <h1>MeetingMate AI</h1>
-
-    <p>
-        Convert meeting conversations into structured priorities,
-        responsibilities, decisions and follow-up actions — in seconds.
-    </p>
-
-</div>
-""",
-    unsafe_allow_html=True
+st.write(
+    "Convert meeting conversations into structured priorities, "
+    "responsibilities, decisions and follow-up actions — in seconds."
 )
 
 
 # =========================================================
-# FEATURE CARDS
+# FEATURE OVERVIEW
 # =========================================================
 
-card1, card2, card3, card4 = st.columns(4)
+st.divider()
 
+st.subheader("What MeetingMate Can Extract")
 
-with card1:
+col1, col2, col3, col4 = st.columns(4)
 
-    st.markdown(
-        """
-<div class="stat-card">
-
-    <div class="stat-icon">🎯</div>
-
-    <div class="stat-title">
-        Key Takeaways
-    </div>
-
-    <div class="stat-text">
-        Identify the most important points discussed.
-    </div>
-
-</div>
-""",
-        unsafe_allow_html=True
+with col1:
+    st.metric(
+        label="🎯 Key Takeaways",
+        value="Focus"
+    )
+    st.caption(
+        "Identify the most important discussion points."
     )
 
-
-with card2:
-
-    st.markdown(
-        """
-<div class="stat-card">
-
-    <div class="stat-icon">✅</div>
-
-    <div class="stat-title">
-        Task Tracker
-    </div>
-
-    <div class="stat-text">
-        Capture commitments and responsibilities.
-    </div>
-
-</div>
-""",
-        unsafe_allow_html=True
+with col2:
+    st.metric(
+        label="✅ Task Tracker",
+        value="Actions"
+    )
+    st.caption(
+        "Capture commitments and responsibilities."
     )
 
-
-with card3:
-
-    st.markdown(
-        """
-<div class="stat-card">
-
-    <div class="stat-icon">💡</div>
-
-    <div class="stat-title">
-        Decision Capture
-    </div>
-
-    <div class="stat-text">
-        Separate decisions from general discussion.
-    </div>
-
-</div>
-""",
-        unsafe_allow_html=True
+with col3:
+    st.metric(
+        label="💡 Decisions",
+        value="Clarity"
+    )
+    st.caption(
+        "Separate decisions from general discussion."
     )
 
-
-with card4:
-
-    st.markdown(
-        """
-<div class="stat-card">
-
-    <div class="stat-icon">⚠️</div>
-
-    <div class="stat-title">
-        Open Issues
-    </div>
-
-    <div class="stat-text">
-        Highlight dependencies and unresolved matters.
-    </div>
-
-</div>
-""",
-        unsafe_allow_html=True
+with col4:
+    st.metric(
+        label="⚠️ Open Issues",
+        value="Risks"
     )
-
-
-st.write("")
-st.write("")
+    st.caption(
+        "Highlight dependencies and unresolved matters."
+    )
 
 
 # =========================================================
-# INPUT SECTION
+# MEETING INPUT
 # =========================================================
 
-st.markdown(
-    """
-<div class="section-label">
-    01 / INPUT
-</div>
+st.divider()
 
-<div class="section-title">
-    Meeting Workspace
-</div>
+st.subheader("01 · Meeting Workspace")
 
-<div class="section-subtitle">
-    Paste a meeting transcript, discussion, call notes or conversation below.
-</div>
-""",
-    unsafe_allow_html=True
+st.write(
+    "Paste a meeting transcript, discussion, call notes "
+    "or conversation below."
 )
 
 
-button_col1, button_col2, empty_col = st.columns(
-    [1.6, 1, 4]
-)
+button1, button2, spacer = st.columns([1.5, 1, 4])
 
 
-with button_col1:
+with button1:
 
     if st.button(
         "📊 Load Demo Meeting",
         use_container_width=True
     ):
-
         st.session_state.meeting_text = SAMPLE_MEETING
-
         st.session_state.analysis_result = ""
-
         st.rerun()
 
 
-with button_col2:
+with button2:
 
     if st.button(
         "↻ Reset",
         use_container_width=True
     ):
-
         st.session_state.meeting_text = ""
-
         st.session_state.analysis_result = ""
-
         st.rerun()
 
 
-# =========================================================
-# MEETING TEXT BOX
-# =========================================================
-
 meeting_text = st.text_area(
     "Meeting conversation",
-
     value=st.session_state.meeting_text,
-
     height=330,
-
     placeholder=(
         "Paste your meeting conversation here...\n\n"
         "Example:\n"
         "Rohan: I'll prepare the report by Friday.\n"
         "Meera: Great. We'll review it next Monday."
-    ),
-
-    label_visibility="collapsed"
+    )
 )
-
 
 st.session_state.meeting_text = meeting_text
 
@@ -540,34 +326,23 @@ st.session_state.meeting_text = meeting_text
 # ANALYSIS SETTINGS
 # =========================================================
 
-st.write("")
+st.divider()
 
+st.subheader("02 · Analysis Settings")
 
-st.markdown(
-    """
-<div class="section-label">
-    02 / ANALYSIS SETTINGS
-</div>
-
-<div class="section-title">
-    Choose Analysis Depth
-</div>
-""",
-    unsafe_allow_html=True
+st.write(
+    "Choose how detailed you want the meeting analysis to be."
 )
 
 
 analysis_mode = st.radio(
-    "Analysis mode",
-
+    "Analysis depth",
     [
         "Quick Scan",
         "Standard Analysis",
         "Detailed Review"
     ],
-
     horizontal=True,
-
     index=1
 )
 
@@ -582,7 +357,7 @@ takeaways, confirmed tasks and decisions.
 elif analysis_mode == "Detailed Review":
 
     mode_instruction = """
-Provide a detailed review including context,
+Provide a detailed review including relevant context,
 dependencies, unresolved issues and follow-up items.
 """
 
@@ -595,11 +370,10 @@ context while avoiding unnecessary detail.
 
 
 # =========================================================
-# ANALYSE BUTTON
+# GENERATE ANALYSIS
 # =========================================================
 
 st.write("")
-
 
 analyse = st.button(
     "⚡ Generate Meeting Intelligence",
@@ -609,7 +383,7 @@ analyse = st.button(
 
 
 # =========================================================
-# AI ANALYSIS
+# AI PROCESSING
 # =========================================================
 
 if analyse:
@@ -617,7 +391,8 @@ if analyse:
     if not meeting_text.strip():
 
         st.warning(
-            "Please add a meeting conversation before running the analysis."
+            "Please add a meeting conversation before "
+            "running the analysis."
         )
 
     else:
@@ -682,7 +457,6 @@ MEETING CONVERSATION:
 {meeting_text}
 """
 
-
         with st.spinner(
             "MeetingMate is analysing the conversation..."
         ):
@@ -690,39 +464,30 @@ MEETING CONVERSATION:
             try:
 
                 response = client.chat.completions.create(
-
                     model="openai/gpt-oss-120b",
 
                     messages=[
-
                         {
                             "role": "system",
-
                             "content": (
                                 "You are a professional meeting analysis "
                                 "assistant. Accuracy and faithful extraction "
                                 "are more important than creativity."
                             )
                         },
-
                         {
                             "role": "user",
-
                             "content": prompt
                         }
-
                     ],
 
                     temperature=0.2,
-
                     max_tokens=1800
                 )
-
 
                 st.session_state.analysis_result = (
                     response.choices[0].message.content
                 )
-
 
             except Exception as e:
 
@@ -737,51 +502,26 @@ MEETING CONVERSATION:
 
 
 # =========================================================
-# OUTPUT SECTION
+# RESULTS
 # =========================================================
 
 if st.session_state.analysis_result:
 
-    st.write("")
-    st.write("")
+    st.divider()
 
-    st.markdown(
-        """
-<div class="section-label">
-    03 / INTELLIGENCE REPORT
-</div>
+    st.subheader("03 · Intelligence Report")
 
-<div class="section-title">
-    Meeting Analysis
-</div>
-
-<div class="section-subtitle">
-    Structured insights generated from the submitted conversation.
-</div>
-""",
-        unsafe_allow_html=True
+    st.caption(
+        "Structured insights generated from the submitted conversation."
     )
 
+    with st.container(border=True):
 
-    st.markdown(
-        '<div class="result-box">',
-        unsafe_allow_html=True
-    )
-
-
-    st.markdown(
-        st.session_state.analysis_result
-    )
-
-
-    st.markdown(
-        '</div>',
-        unsafe_allow_html=True
-    )
-
+        st.markdown(
+            st.session_state.analysis_result
+        )
 
     st.write("")
-
 
     st.info(
         "👤 Human Review Recommended — "
@@ -795,21 +535,9 @@ if st.session_state.analysis_result:
 # FOOTER
 # =========================================================
 
-st.markdown(
-    """
-<div class="footer">
+st.divider()
 
-    <b>MeetingMate AI</b>
-
-    <br>
-
-    From conversation to clarity.
-
-    <br><br>
-
-    Academic Project • FORE School of Management
-
-</div>
-""",
-    unsafe_allow_html=True
+st.caption(
+    "🤝 MeetingMate AI  •  From conversation to clarity  •  "
+    "Academic Project • FORE School of Management"
 )
